@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'reusable_card.dart';
-import 'icon_content.dart';
-import 'constants.dart';
-import 'round_icon_button.dart';
+import 'package:bmi_calculator/components/reusable_card.dart';
+import 'package:bmi_calculator/components/icon_content.dart';
+import 'package:bmi_calculator/constants.dart';
+import 'package:bmi_calculator/components/round_icon_button.dart';
+import 'package:bmi_calculator/components/bottom_button.dart';
+import 'package:bmi_calculator/mbi_calculator.dart';
+import 'package:bmi_calculator/screens/results_page.dart';
 
 enum GenderType {
   male,
@@ -23,7 +26,6 @@ class _InputPageState extends State<InputPage> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      
       appBar: AppBar(
         title: Center(child: Text('BMI Calculator')),
       ),
@@ -45,8 +47,8 @@ class _InputPageState extends State<InputPage> {
                       gender: 'MALE',
                     ),
                     color: selectedGender == GenderType.male
-                        ? activeCardColor
-                        : inactiveCardColor,
+                        ? kActiveCardColor
+                        : kInactiveCardColor,
                   ),
                 ),
                 Expanded(
@@ -61,8 +63,8 @@ class _InputPageState extends State<InputPage> {
                       gender: 'FEMALE',
                     ),
                     color: selectedGender == GenderType.female
-                        ? activeCardColor
-                        : inactiveCardColor,
+                        ? kActiveCardColor
+                        : kInactiveCardColor,
                   ),
                 ),
               ],
@@ -94,33 +96,30 @@ class _InputPageState extends State<InputPage> {
                   ),
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: Colors.white,
-                      inactiveTrackColor: Color(0xFF8D8E98),
-                      thumbColor: Color(0xFFEB1555),
-                      overlayColor: Color(0x29EB1555),
-                      thumbShape: RoundSliderThumbShape(
-                        enabledThumbRadius: 15.0,
-                      ),
-                      overlayShape: RoundSliderOverlayShape(
-                        overlayRadius: 30.0,
-                      )
-                    ),
+                        activeTrackColor: Colors.white,
+                        inactiveTrackColor: Color(0xFF8D8E98),
+                        thumbColor: Color(0xFFEB1555),
+                        overlayColor: Color(0x29EB1555),
+                        thumbShape: RoundSliderThumbShape(
+                          enabledThumbRadius: 10.0,
+                        ),
+                        overlayShape: RoundSliderOverlayShape(
+                          overlayRadius: 20.0,
+                        )),
                     child: Slider(
                       value: height.toDouble(),
                       onChanged: (double newHeight) {
-                        print(newHeight);
                         setState(() {
                           height = newHeight.round();
                         });
                       },
                       min: 120.0,
                       max: 220.0,
-
                     ),
                   ),
                 ],
               ),
-              color: activeCardColor,
+              color: kActiveCardColor,
             ),
           ),
           Expanded(
@@ -128,7 +127,7 @@ class _InputPageState extends State<InputPage> {
               children: <Widget>[
                 Expanded(
                   child: ReUsableCard(
-                    color: activeCardColor,
+                    color: kActiveCardColor,
                     cardChild: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -145,7 +144,7 @@ class _InputPageState extends State<InputPage> {
                           children: <Widget>[
                             RoundIconButton(
                               icon: FontAwesomeIcons.minus,
-                              onPressed: (){
+                              onPressed: () {
                                 setState(() {
                                   weight--;
                                 });
@@ -156,7 +155,7 @@ class _InputPageState extends State<InputPage> {
                             ),
                             RoundIconButton(
                               icon: FontAwesomeIcons.plus,
-                              onPressed: (){
+                              onPressed: () {
                                 setState(() {
                                   weight++;
                                 });
@@ -170,7 +169,7 @@ class _InputPageState extends State<InputPage> {
                 ),
                 Expanded(
                   child: ReUsableCard(
-                    color: activeCardColor,
+                    color: kActiveCardColor,
                     cardChild: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -187,7 +186,7 @@ class _InputPageState extends State<InputPage> {
                           children: <Widget>[
                             RoundIconButton(
                               icon: FontAwesomeIcons.minus,
-                              onPressed: (){
+                              onPressed: () {
                                 setState(() {
                                   age--;
                                 });
@@ -198,7 +197,7 @@ class _InputPageState extends State<InputPage> {
                             ),
                             RoundIconButton(
                               icon: FontAwesomeIcons.plus,
-                              onPressed: (){
+                              onPressed: () {
                                 setState(() {
                                   age++;
                                 });
@@ -213,16 +212,27 @@ class _InputPageState extends State<InputPage> {
               ],
             ),
           ),
-          Container(
-            color: bottomContainerColor,
-            margin: EdgeInsets.only(top: 10.0),
-            height: bottomContainerHeight,
-            width: double.infinity,
+          BottomButton(
+            text: 'CALCULATE',
+            onPressed: () {
+              final bmiCalc = BMICalculator(
+                height: height.toDouble(),
+                weight: weight.toDouble(),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ResultsPage(
+                    bmi: bmiCalc.calculateBMI(),
+                    result: bmiCalc.getResult(),
+                    interpretation: bmiCalc.getInterpretation(),
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
     );
   }
 }
-
-
